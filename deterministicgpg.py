@@ -36,6 +36,7 @@ def import_gpg_key(gpg_id):
   gpg_import.communicate(gpg_id)
 
 if __name__ == '__main__':
+  import sys
   name = ""
   email = ""
   
