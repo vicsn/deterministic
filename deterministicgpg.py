@@ -16,10 +16,10 @@ import hashlib
 import subprocess
 from Crypto.PublicKey import RSA
 
-
-def create_gpg_key(user_id, seed):
+def create_gpg_key(user_id, seed, rand=None):
   
-  rand = drbg.HMAC_DRBG(seed)
+  if (rand is None):
+    rand = drbg.PBKDF2_HMAC(seed)
 
   key = RSA.generate(4096, rand.read)
 
@@ -36,7 +36,6 @@ def import_gpg_key(gpg_id):
   gpg_import.communicate(gpg_id)
 
 if __name__ == '__main__':
-  import sys
   name = ""
   email = ""
   
