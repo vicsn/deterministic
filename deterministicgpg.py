@@ -16,10 +16,9 @@ import hashlib
 import subprocess
 from Crypto.PublicKey import RSA
 
-def create_gpg_key(user_id, seed, rand=None):
+def create_gpg_key(user_id, seed):
   
-  if (rand is None):
-    rand = drbg.PBKDF2_HMAC(seed)
+  rand = drbg.SHAKE(seed)
 
   key = RSA.generate(4096, rand.read)
 
@@ -36,13 +35,9 @@ def import_gpg_key(gpg_id):
   gpg_import.communicate(gpg_id)
 
 if __name__ == '__main__':
-  import sys
-  name = ""
-  email = ""
-  
   # get name/email for GPG id
-  name = raw_input('Name: ')
-  email= raw_input('Email: ')
+  name = input('Name: ')
+  email= input('Email: ')
 
   user_id = '%s <%s>' % (name, email)
 
@@ -50,9 +45,9 @@ if __name__ == '__main__':
   #   action draw bit shove single however shore language visit wonderful swell pale
   #   motion shut tool sadness focus scratch wash match torture tightly situation jump
   seed ="action draw bit shove single however shore language visit wonderful swell pale motion shut tool sadness focus scratch wash match torture tightly situation jump"
-  if(raw_input("do you want to give a custom seed? (y/n)") == "y"):
-      seed = raw_input()
+  if(input("do you want to give a custom seed? (y/n)") == "y"):
+      seed = input()
         
   gpg_id = create_gpg_key(user_id, seed)
-  if(raw_input("do you actually want to import the generated key into your gpg keyring? (y/n)") == "y"):
+  if(input("do you actually want to import the generated key into your gpg keyring? (y/n)") == "y"):
     import_gpg_key(gpg_id)

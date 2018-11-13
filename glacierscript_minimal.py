@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ################################################################################################
 #
@@ -42,17 +42,17 @@ def validate_rng_seed(seed, min_length):
     """
 
     if len(seed) < min_length:
-        print "Error: Computer entropy must be at least {0} characters long".format(min_length)
+        print("Error: Computer entropy must be at least {0} characters long".format(min_length))
         return False
 
     if len(seed) % 2 != 0:
-        print "Error: Computer entropy must contain an even number of characters."
+        print("Error: Computer entropy must contain an even number of characters.")
         return False
 
     try:
         int(seed, 16)
     except ValueError:
-        print "Error: Illegal character. Computer entropy must be composed of hexadecimal characters only (0-9, a-f)."
+        print("Error: Illegal character. Computer entropy must be composed of hexadecimal characters only (0-9, a-f).")
         return False
 
     return True
@@ -68,15 +68,15 @@ def read_rng_seed_interactive(min_length):
     char_length = min_length * 2
 
     def ask_for_rng_seed(length):
-        print "Enter at least {0} characters of computer entropy. Spaces are OK, and will be ignored:".format(length)
+        print("Enter at least {0} characters of computer entropy. Spaces are OK, and will be ignored:".format(length))
 
     ask_for_rng_seed(char_length)
-    seed = raw_input()
+    seed = input()
     seed = unchunk(seed)
 
     while not validate_rng_seed(seed, char_length):
         ask_for_rng_seed(char_length)
-        seed = raw_input()
+        seed = input()
         seed = unchunk(seed)
 
     return seed
@@ -90,17 +90,17 @@ def validate_dice_seed(dice, min_length):
     """
 
     if len(dice) < min_length:
-        print "Error: You must provide at least {0} dice rolls".format(min_length)
+        print("Error: You must provide at least {0} dice rolls".format(min_length))
         return False
 
     for die in dice:
         try:
             i = int(die)
             if i < 1 or i > 6:
-                print "Error: Dice rolls must be between 1 and 6."
+                print("Error: Dice rolls must be between 1 and 6.")
                 return False
         except ValueError:
-            print "Error: Dice rolls must be numbers between 1 and 6"
+            print("Error: Dice rolls must be numbers between 1 and 6")
             return False
 
     return True
@@ -115,15 +115,15 @@ def read_dice_seed_interactive(min_length):
     """
 
     def ask_for_dice_seed(x):
-        print "Enter {0} dice rolls (example: 62543 16325 21341...) Spaces are OK, and will be ignored:".format(x)
+        print("Enter {0} dice rolls (example: 62543 16325 21341...) Spaces are OK, and will be ignored:".format(x))
 
     ask_for_dice_seed(min_length)
-    dice = raw_input()
+    dice = input()
     dice = unchunk(dice)
 
     while not validate_dice_seed(dice, min_length):
         ask_for_dice_seed(min_length)
-        dice = raw_input()
+        dice = input()
         dice = unchunk(dice)
 
     return dice
@@ -160,7 +160,7 @@ def xor_hex_strings(str1, str2):
 
 def yes_no_interactive():
     def confirm_prompt():
-        return raw_input("Confirm? (y/n): ")
+        return input("Confirm? (y/n): ")
 
     confirm = confirm_prompt()
 
@@ -170,7 +170,7 @@ def yes_no_interactive():
         if confirm.upper() == "N":
             return False
         else:
-            print "You must enter y (for yes) or n (for no)."
+            print("You must enter y (for yes) or n (for no).")
             confirm = confirm_prompt()
 
 def safety_checklist():
@@ -184,9 +184,9 @@ def safety_checklist():
         "Are smartphones and all other nearby devices turned off and in a Faraday bag?"]
 
     for check in checks:
-        answer = raw_input(check + " (y/n)?")
+        answer = input(check + " (y/n)?")
         if answer.upper() != "Y":
-            print "\n Safety check failed. Exiting."
+            print("\n Safety check failed. Exiting.")
             sys.exit()
 
 ################################################################################################
@@ -207,11 +207,11 @@ def format_chunks(size, string):
     """
     tail = ""
     remainder = len(string) % size
-    arr = [string[size * i: size * i + size] for i in range(len(string) / size)]
+    arr = [string[size * i: size * i + size] for i in range(int(len(string) / size))]
     body = " ".join(arr)
     if remainder > 0:
         tail = string[-remainder:]
-    return body + " " + tail
+    return body + " " + tail.decode('utf-8')
 
 
 def entropy(n, length):
@@ -219,17 +219,17 @@ def entropy(n, length):
     Generate n random strings for the user from /dev/random
     """
 
-    print "\n\n"
-    print "Making {} random data strings....".format(n)
-    print "If strings don't appear right away, please continually move your mouse cursor. These movements generate entropy which is used to create random data.\n"
+    print("\n\n")
+    print("Making {} random data strings....".format(n))
+    print("If strings don't appear right away, please continually move your mouse cursor. These movements generate entropy which is used to create random data.\n")
 
     idx = 0
     while idx < n:
         seed = subprocess.check_output(
             "xxd -l {} -p /dev/random".format(length), shell=True)
         idx += 1
-        seed = seed.replace('\n', '')
-        print "Computer entropy #{0}: {1}".format(idx, format_chunks(4, seed))
+        seed = seed.strip()
+        print("Computer entropy #{0}: {1}".format(idx, format_chunks(4, seed)))
 
 ################################################################################################
 #
@@ -240,7 +240,7 @@ def entropy(n, length):
 def hash_sha256(s):
     """A thin wrapper around the hashlib SHA256 library to provide a more functional interface"""
     m = sha256()
-    m.update(s)
+    m.update(s.encode('utf-8'))
     return m.hexdigest()
 
 ################################################################################################
@@ -261,7 +261,7 @@ def deposit_interactive(n, dice_seed_length=62, rng_seed_length=20):
 
     while len(keys) < n:
         index = len(keys) + 1
-        print "\nCreating private key #{}".format(index)
+        print("\nCreating private key #{}".format(index))
 
         dice_seed_string = read_dice_seed_interactive(dice_seed_length)
         dice_seed_hash = hash_sha256(dice_seed_string)
@@ -274,10 +274,10 @@ def deposit_interactive(n, dice_seed_length=62, rng_seed_length=20):
 
         keys.append(hex_private_key)
 
-    print "Private keys created."
-    print "Private keys:"
+    print("Private keys created.")
+    print("Private keys:")
     for idx, key in enumerate(keys):
-        print "Key #{0}: {1}".format(idx + 1, key)
+        print("Key #{0}: {1}".format(idx + 1, key))
     
     return keys
 
