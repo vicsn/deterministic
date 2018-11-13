@@ -32,7 +32,7 @@ Then follow instructions. The script will allow you to:
 Issues
 ------
 
-1. PyCryptodome's RSA key generation requires a RNG [here](https://github.com/Legrandin/pycryptodome/blob/master/lib/Crypto/Random/__init__.py) to generate > 100000 bytes. This repo uses [pbkdf2_hmac](https://docs.python.org/2/library/hashlib.html#key-derivation) as a deterministic drop-in replacement. Is this correct?
+1. PyCryptodome's RSA key generation requires a RNG [here](https://github.com/Legrandin/pycryptodome/blob/master/lib/Crypto/Random/__init__.py) to generate > 100000 bytes. This repo uses [pbkdf2_hmac](https://docs.python.org/2/library/hashlib.html#key-derivation) as a deterministic drop-in replacement using the hash of the mnemonic as a seed. Is this correct?
 
    Alternatives may be [AES-CTR](https://pycryptodome.readthedocs.io/en/latest/src/cipher/aes.html), [SHAKE](https://docs.python.org/3/library/hashlib.html#shake-variable-length-digests) or [OpenPGP S2K](https://tools.ietf.org/html/rfc4880#section-3.7). The repository from which this code was forked used an uncommon library: [HMAC_DRBG](https://github.com/fpgaminer/python-hmac-drbg/tree/aa09924419266a6ad478022ae3da32eab4587c8f).
    Compared to these alternatives, pbkdf2_hmac may be the most time consuming to crack. This may just be a theoretical concern since you can feed the algorithm with a large amount of entropy.
